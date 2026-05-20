@@ -135,9 +135,12 @@ class PlaylistParser:
     <head>
         <title>Spotify Playlists</title>
         <style>{self.__get_stylesheet()}</style>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
-        <h1>{self.json_filename}</h2>
+        <h1>Spotify Data</h1>
+
+        <p class="filename">{self.json_filename}</p>
 
         {self.__get_errors_html()}
 
@@ -150,8 +153,54 @@ class PlaylistParser:
 
 
     def __get_stylesheet(self) -> str:
-        return """th {
+        return """body {
+  font-family: "Roboto Sans", sans-serif;
+  line-height: 1.5;
+  margin: 0 auto;
+  max-width: 1600px;
+  /* Scale padding linearly from 5px (600px wide viewport) to 20px (900px wide viewport) (CSS Clamp Generator) */
+  padding: 0 clamp(5px, calc(5vw - 25px), 20px);
+}
+
+h3 {
+  font-size: 1.35rem;
+}
+
+table {
+  width: 100%;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+th {
+  font-size: 1.15rem;
   text-align: left;
+}
+
+th, td {
+  word-break: break-word;
+}
+
+.playlist-name {
+  border-bottom: 4px solid green;
+}
+
+.col-track-name {
+}
+
+.col-artist {
+  width: 25%
+}
+
+.col-album {
+  width: 25%
+}
+
+.filename {
+  font-style: italic;
+  word-break: break-word;
 }"""
 
 
@@ -206,20 +255,24 @@ class PlaylistParser:
 
         for track in playlist.tracks:
             playlist_rows_io.write(f"""<tr>
-    <td>{track.name}</td>
-    <td>{track.artist}</td>
-    <td>{track.album}</td>
+    <td class="col-track-name">{track.name}</td>
+    <td class="col-artist">{track.artist}</td>
+    <td class="col-album">{track.album}</td>
 </tr>""")
 
         return f"""
-    <h3><a id="{playlist.name}">{playlist.name}</a></h3>
+    <h3 class="playlist-name"><a id="{playlist.name}">{playlist.name}</a></h3>
     <table>
-        <tr>
-            <th>Track Name</th>
-            <th>Artist</th>
-            <th>Album</th>
-        </tr>
-        {playlist_rows_io.getvalue()}
+        <thead>
+            <tr>
+                <th class="col-track-name">Track Name</th>
+                <th class="col-artist">Artist</th>
+                <th class="col-album">Album</th>
+            </tr>
+        </thead>
+        <tbody>
+            {playlist_rows_io.getvalue()}
+        </tbody>
     </table>
 </section>"""
 
