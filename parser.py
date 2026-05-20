@@ -1,3 +1,4 @@
+import html
 import json
 import os
 import sys
@@ -134,8 +135,9 @@ class PlaylistParser:
 <html>
     <head>
         <title>Spotify Playlists</title>
-        <style>{self.__get_stylesheet()}</style>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+        <style>{self.__get_stylesheet()}</style>
     </head>
     <body>
         <h1>Spotify Data</h1>
@@ -243,7 +245,8 @@ th, td {
 
         contents_io = StringIO()
         for playlist in self.playlists:
-            contents_io.write(f'<li><a href="#{playlist.name}">{playlist.name}</a></li>')
+            escaped_name = html.escape(playlist.name)
+            contents_io.write(f'<li><a href="#{escaped_name}">{escaped_name}</a></li>')
 
         return f"""<ul>
     {contents_io.getvalue()}
@@ -252,16 +255,17 @@ th, td {
 
     def __get_playlist_html(self, playlist: Playlist) -> str:
         playlist_rows_io = StringIO()
+        escaped_name = html.escape(playlist.name)
 
         for track in playlist.tracks:
             playlist_rows_io.write(f"""<tr>
-    <td class="col-track-name">{track.name}</td>
-    <td class="col-artist">{track.artist}</td>
-    <td class="col-album">{track.album}</td>
+    <td class="col-track-name">{html.escape(track.name)}</td>
+    <td class="col-artist">{html.escape(track.artist)}</td>
+    <td class="col-album">{html.escape(track.album)}</td>
 </tr>""")
 
         return f"""
-    <h3 class="playlist-name"><a id="{playlist.name}">{playlist.name}</a></h3>
+    <h3 class="playlist-name"><a id="{escaped_name}">{escaped_name}</a></h3>
     <table>
         <thead>
             <tr>
